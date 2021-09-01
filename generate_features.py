@@ -29,6 +29,27 @@ def get_agreeability(pair_obj):
 
   return {"agreeability": concur / (concur + dispute)}
 
+def normalize(input_counter):
+  result = {}
+  total = sum(input_counter.values())
+  for key, count in input_counter.items():
+    result["raw_"+key] = count
+    result["normalized_"+key] = count/total
+  return result
+
+def get_review_ratios(pair_obj):
+  coarse_counter = collections.Counter()
+  fine_counter = collections.Counter()
+  for sentence in pair_obj["review_sentences"]:
+    coarse_counter[sentence["coarse"]] += 1
+    if sentence["coarse"] == 'arg_request':
+      fine_counter[sentence["fine"]] += 1
+
+  normalized = normalize(coarse_counter)
+  normalized.update(normalize(fine_counter))
+
+  return normalized
+
 
 def get_politeness(pair_obj):
   utterance = [
@@ -43,10 +64,16 @@ def get_politeness(pair_obj):
   corpus = ps.transform(corpus, markers=True)
   return corpus.get_utterances_dataframe()["meta.politeness_strategies"][0]
 
+def get_metadata(pair_obj):
+  return {
+  "review_id":pair_obj["metadata"]["review_id"],
+  "forum_id":pair_obj["metadata"]["forum_id"],
+  }
+
 
 def get_features(pair_obj):
   overall_features = {}
-  for fn in [get_agreeability, get_politeness]:
+  for fn in [get_metadata, get_agreeability, get_politeness, get_review_ratios]:
     overall_features.update(fn(pair_obj))
   return overall_features
 
@@ -55,10 +82,14 @@ def main():
 
   args = parser.parse_args()
 
+  feature_list = []
   for filename in tqdm.tqdm(glob.glob(args.input_dir + "/*")):
     with open(filename, 'r') as f:
       pair_obj = json.load(f)
-      features = get_features(pair_obj)
+      feature_list.append(get_features(pair_obj))
+
+  for i in feature_list:
+    print(i)
 
 
 if __name__ == "__main__":
