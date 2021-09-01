@@ -12,8 +12,13 @@ parser.add_argument(
     '-i',
     '--input_dir',
     type=str,
-    default="../peer-review-discourse-dataset/data_prep/final_dataset/train/")
-
+    default="dataset/train/")
+parser.add_argument(
+    '-o',
+    '--output_file',
+    type=str,
+    default="features.json")
+    
 text_parser = TextParser()
 ps = PolitenessStrategies()
 REVIEWER_SPEAKER = Speaker(id="reviewer_id0", name="Reviewer0")
@@ -88,8 +93,9 @@ def main():
       pair_obj = json.load(f)
       feature_list.append(get_features(pair_obj))
 
-  for i in feature_list:
-    print(i)
+
+  with open(args.output_file, 'w') as f:
+    json.dump(feature_list, f)
 
 
 if __name__ == "__main__":

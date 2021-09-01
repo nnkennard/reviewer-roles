@@ -1,0 +1,6 @@
+ExKMC==0.0.3
+ipython==7.27.0
+jupyter==1.0.0
+tqdm==4.62.2
+convokit==2.5
+yapf==0.31.0
