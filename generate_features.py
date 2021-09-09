@@ -77,9 +77,10 @@ def get_politeness(pair_obj):
 
 
 def get_metadata(pair_obj):
+
+  keys = "review_id forum_id rating".split()
   return {
-      "review_id": pair_obj["metadata"]["review_id"],
-      "forum_id": pair_obj["metadata"]["forum_id"],
+      key: pair_obj["metadata"][key] for key in keys
   }
 
 

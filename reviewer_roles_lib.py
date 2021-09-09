@@ -47,7 +47,6 @@ def tree_dfs_helper(i, tree_nodes, node_rule_map, terminal_node_map,
 
 
 def tree_parser(tree_filename, feature_vectorizer):
-  print(tree_filename)
   feature_list = feature_vectorizer.get_feature_names()
   with open(tree_filename, 'r') as f:
     tree_lines = f.readlines()
