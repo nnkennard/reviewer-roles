@@ -11,6 +11,7 @@ NodeRule = collections.namedtuple("NodeRule",
 TerminalNode = collections.namedtuple("TerminalNode",
                                       "node label samples mistakes".split())
 
+feature_rules = []
 
 class MyTreeNode(object):
 
@@ -31,23 +32,30 @@ def tree_dfs_helper(i, tree_nodes, node_rule_map, terminal_node_map,
   for (direction, child) in [("l", tree_nodes[i].left_child),
                              ("r", tree_nodes[i].right_child)]:
     if child is None:
+      new_entry = []
       print(terminal_node_map[str(i)].label, end=": ")
+      new_entry.append(terminal_node_map[str(i)].label)
       for i in range(0, len(path_so_far) - 1, 2):
         node = path_so_far[i]
         child_dir = path_so_far[i + 1]
         rule_node = node_rule_map[str(node)]
         if child_dir == "l":
           print(rule_node.feature, "<=", rule_node.threshold, end="; ")
+          tuple = (rule_node.feature, "<=", rule_node.threshold)
+          new_entry.append(tuple)
         else:
           print(rule_node.feature, ">", rule_node.threshold, end="; ")
+          tuple = (rule_node.feature, ">", rule_node.threshold)
+          new_entry.append(tuple)
       print()
+      feature_rules.append(new_entry)
       return
     tree_dfs_helper(child, tree_nodes, node_rule_map, terminal_node_map,
                     path_so_far + [direction, child])
 
-
 def tree_parser(tree_filename, feature_vectorizer):
   feature_list = feature_vectorizer.get_feature_names()
+  feature_rules.clear() #clear feature rules 
   with open(tree_filename, 'r') as f:
     tree_lines = f.readlines()
   label_lines = [line.strip() for line in tree_lines[1:] if '->' not in line]
@@ -88,6 +96,8 @@ def tree_parser(tree_filename, feature_vectorizer):
 
   tree_dfs_helper(0, tree_nodes, node_rule_map, terminal_node_map, [0])
 
+def get_feature_array():
+  return feature_rules
 
 def get_angles_from_categories(categories):
   N = len(categories)
